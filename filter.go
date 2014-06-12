@@ -31,7 +31,12 @@ func (f *Filter) queryToRegexps(query string) ([]*regexp.Regexp, error) {
 
 	flags := []string{}
 	if f.IgnoreCase {
-		flags = append(flags, "i")
+		// SmartCase is used only when IgnoreCase option is on. (same behavior as vim)
+		if f.SmartCase && regexp.MustCompile("[A-Z]").MatchString(query) {
+			// no ignore-case
+		} else {
+			flags = append(flags, "i")
+		}
 	}
 	flagTxt := ""
 	if len(flags) > 0 {

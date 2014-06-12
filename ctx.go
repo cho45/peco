@@ -2,6 +2,7 @@ package peco
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"sync"
@@ -23,6 +24,7 @@ type Ctx struct {
 	current      []Match
 	config       *Config
 	IgnoreCase   bool
+	SmartCase    bool
 	ExitStatus   int
 
 	wait *sync.WaitGroup
@@ -48,13 +50,25 @@ func NewCtx() *Ctx {
 		nil,
 		NewConfig(),
 		true,
+		true,
 		0,
 		&sync.WaitGroup{},
 	}
 }
 
 func (c *Ctx) ReadConfig(file string) error {
-	return c.config.ReadFilename(file)
+	err := c.config.ReadFilename(file)
+	if (err == nil) {
+		switch c.config.SmartCase.(type) {
+		case bool:
+			c.SmartCase = c.config.SmartCase.(bool)
+		case nil:
+			c.SmartCase = true
+		default:
+			return errors.New("`SmartCase` must be boolean")
+		}
+	}
+	return err;
 }
 
 func (c *Ctx) Result() string {

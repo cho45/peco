@@ -7,6 +7,7 @@ import (
 
 type Config struct {
 	Keymap Keymap `json:"Keymap"`
+	SmartCase interface{} `json:"SmartCase"`
 }
 
 func NewConfig() *Config {
